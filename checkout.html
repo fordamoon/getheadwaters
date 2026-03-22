@@ -128,6 +128,33 @@
       border-top: 1px solid var(--border);
     }
     .secure-badge { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+    .promo-toggle {
+      display: inline-block; font-size: 13px; font-weight: 500;
+      color: var(--muted); cursor: pointer; margin-top: 2px;
+      background: none; border: none; padding: 0; font-family: inherit;
+      text-decoration: underline; text-decoration-color: var(--border);
+      transition: color 0.15s;
+    }
+    .promo-toggle:hover { color: var(--navy); }
+    .promo-field {
+      display: none; margin-top: 12px;
+    }
+    .promo-field.open { display: block; }
+    .promo-input-wrap {
+      display: flex; gap: 8px;
+    }
+    .promo-input {
+      flex: 1; padding: 11px 14px;
+      border: 1.5px solid var(--border); border-radius: 9px;
+      font-size: 14px; font-family: inherit; color: var(--text);
+      background: var(--white); transition: border-color 0.15s;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .promo-input:focus { outline: none; border-color: var(--teal); }
+    .promo-input.error { border-color: var(--error); }
+    .promo-input.success { border-color: #16A34A; }
+    .promo-err { font-size: 12px; color: var(--error); margin-top: 5px; display: none; }
+    .promo-err.visible { display: block; }
     @media (max-width: 720px) {
       .checkout-wrap { grid-template-columns: 1fr; }
       .order-summary { order: 2; }
@@ -187,7 +214,14 @@
           <input class="form-input" type="email" id="email" name="email" placeholder="jane@yourbusiness.com" autocomplete="email" required>
           <div class="err-msg" id="email-err">Please enter a valid email address.</div>
         </div>
-        <button class="submit-btn" type="submit" id="submit-btn">
+        <button type="button" class="promo-toggle" onclick="togglePromo()">Have a promo code?</button>
+        <div class="promo-field" id="promo-field">
+          <div class="promo-input-wrap">
+            <input class="promo-input" type="text" id="promo-code" placeholder="BETA2026" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="promo-err" id="promo-err">Invalid promo code.</div>
+        </div>
+        <button class="submit-btn" type="submit" id="submit-btn" style="margin-top:18px;">
           Continue to Payment →
         </button>
         <p class="submit-note">Your card will be charged $297.00 today. Cancel anytime.</p>
@@ -202,16 +236,24 @@
 </div>
 
 <script>
+  function togglePromo() {
+    const field = document.getElementById('promo-field');
+    field.classList.toggle('open');
+    if (field.classList.contains('open')) {
+      document.getElementById('promo-code').focus();
+    }
+  }
+
   async function handleSubmit(e) {
     e.preventDefault();
 
-    const name  = document.getElementById('name').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const btn   = document.getElementById('submit-btn');
+    const name      = document.getElementById('name').value.trim();
+    const email     = document.getElementById('email').value.trim();
+    const promoCode = document.getElementById('promo-code').value.trim().toUpperCase();
+    const btn       = document.getElementById('submit-btn');
     const globalErr = document.getElementById('global-err');
     let valid = true;
 
-    // Validate
     if (!name) {
       document.getElementById('name-err').classList.add('visible');
       document.getElementById('name').classList.add('error');
@@ -230,19 +272,33 @@
     }
     if (!valid) return;
 
+    // Clear any previous promo error
+    document.getElementById('promo-err').classList.remove('visible');
+    document.getElementById('promo-code').classList.remove('error');
+
     btn.disabled = true;
     btn.textContent = 'Redirecting to payment...';
     globalErr.classList.remove('visible');
 
     try {
-      const res = await fetch('/.netlify/functions/create-checkout', {
+      const payload = { name, email };
+      if (promoCode) payload.promoCode = promoCode;
+
+      const res  = await fetch('/.netlify/functions/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email })
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
+
       if (data.url) {
         window.location.href = data.url;
+      } else if (data.invalidPromo) {
+        document.getElementById('promo-err').classList.add('visible');
+        document.getElementById('promo-code').classList.add('error');
+        document.getElementById('promo-field').classList.add('open');
+        btn.disabled = false;
+        btn.textContent = 'Continue to Payment →';
       } else {
         throw new Error(data.error || 'Could not create checkout session.');
       }
