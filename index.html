@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Headwaters — Know What's Actually Driving Your Bookings</title>
+  <meta name="description" content="Headwaters is a marketing mix modeling tool built for tourism and hospitality businesses. Upload your data. See which channels are driving revenue.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy:      #0F2340;
+      --navy-deep: #081628;
+      --teal:      #00B896;
+      --teal-dark: #009E82;
+      --teal-light:#E8FBF7;
+      --bg:        #F8FAFC;
+      --white:     #FFFFFF;
+      --text:      #1E293B;
+      --muted:     #64748B;
+      --border:    #E2E8F0;
+      --max-w:     1060px;
+      --r:         12px;
+      --r-sm:      8px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      color: var(--text);
+      background: var(--white);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    .container { width: 100%; max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px; gap: 24px;
+    }
+    .nav-logo {
+      font-size: 16px; font-weight: 800; color: var(--navy);
+      letter-spacing: -0.02em; text-decoration: none; flex-shrink: 0;
+    }
+    .nav-logo span { color: var(--teal); }
+    .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
+    .nav-links a {
+      font-size: 14px; font-weight: 500; color: var(--muted);
+      text-decoration: none; transition: color 0.15s; white-space: nowrap;
+    }
+    .nav-links a:hover { color: var(--navy); }
+    .nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .btn-ghost {
+      font-size: 14px; font-weight: 600; color: var(--navy);
+      padding: 9px 16px; border-radius: var(--r-sm);
+      text-decoration: none; border: 1.5px solid var(--border);
+      transition: border-color 0.15s, background 0.15s; white-space: nowrap;
+    }
+    .btn-ghost:hover { border-color: var(--navy); background: var(--bg); }
+    .btn-nav-cta {
+      font-size: 14px; font-weight: 700; color: var(--white);
+      background: var(--teal); padding: 9px 18px; border-radius: var(--r-sm);
+      text-decoration: none; white-space: nowrap;
+      transition: background 0.15s;
+    }
+    .btn-nav-cta:hover { background: var(--teal-dark); }
+    .nav-toggle {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .nav-toggle span { display: block; width: 22px; height: 2px; background: var(--navy); border-radius: 2px; }
+    .mobile-menu {
+      display: none; flex-direction: column;
+      border-top: 1px solid var(--border); padding: 16px 24px 20px; gap: 14px;
+    }
+    .mobile-menu.open { display: flex; }
+    .mobile-menu a { font-size: 15px; font-weight: 500; color: var(--text); text-decoration: none; }
+    .mobile-menu .btn-nav-cta { text-align: center; display: block; padding: 12px; }
+
+    /* BUTTONS */
+    .btn-primary {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--teal); color: var(--white);
+      font-size: 16px; font-weight: 700; padding: 15px 32px;
+      border-radius: var(--r-sm); text-decoration: none; font-family: inherit;
+      border: none; cursor: pointer; transition: background 0.15s, transform 0.15s;
+      white-space: nowrap;
+    }
+    .btn-primary:hover { background: var(--teal-dark); transform: translateY(-1px); }
+    .btn-outline {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: transparent; color: var(--white);
+      font-size: 16px; font-weight: 600; padding: 15px 32px;
+      border-radius: var(--r-sm); text-decoration: none; font-family: inherit;
+      border: 1.5px solid rgba(255,255,255,0.3); cursor: pointer;
+      transition: border-color 0.15s, background 0.15s; white-space: nowrap;
+    }
+    .btn-outline:hover { border-color: rgba(255,255,255,0.7); background: rgba(255,255,255,0.07); }
+    .btn-cta-navy {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--navy); color: var(--white);
+      font-size: 16px; font-weight: 700; padding: 15px 32px;
+      border-radius: var(--r-sm); text-decoration: none; font-family: inherit;
+      border: none; cursor: pointer; transition: background 0.15s, transform 0.15s;
+    }
+    .btn-cta-navy:hover { background: #1a3560; transform: translateY(-1px); }
+
+    /* HERO */
+    .hero {
+      background: var(--navy);
+      padding: 96px 0 88px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      display: inline-block; font-size: 12px; font-weight: 700;
+      color: var(--teal); text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 22px;
+    }
+    .hero h1 {
+      font-size: clamp(32px, 5vw, 56px); font-weight: 800; color: var(--white);
+      line-height: 1.12; letter-spacing: -0.03em;
+      max-width: 740px; margin: 0 auto 20px;
+    }
+    .hero-sub {
+      font-size: clamp(16px, 2vw, 19px); color: rgba(255,255,255,0.6);
+      max-width: 500px; margin: 0 auto 44px; line-height: 1.65;
+    }
+    .hero-ctas {
+      display: flex; align-items: center; justify-content: center;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .hero-note {
+      font-size: 13px; color: rgba(255,255,255,0.3); margin-top: 18px;
+    }
+
+    /* SECTIONS */
+    section { padding: 88px 0; }
+    .eyebrow {
+      font-size: 12px; font-weight: 700; color: var(--teal);
+      text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 14px;
+    }
+    h2 {
+      font-size: clamp(26px, 3.5vw, 38px); font-weight: 800;
+      color: var(--navy); line-height: 1.18; letter-spacing: -0.025em; margin-bottom: 16px;
+    }
+    .lead {
+      font-size: 17px; color: var(--muted); line-height: 1.7; max-width: 620px;
+    }
+
+    /* CASE STUDY */
+    .case-study { background: var(--bg); }
+    .cs-inner {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+    }
+    .cs-quote {
+      border-left: 3px solid var(--teal); padding-left: 20px; margin: 28px 0;
+    }
+    .cs-quote p {
+      font-size: 18px; font-style: italic; color: var(--navy);
+      font-weight: 600; line-height: 1.55; letter-spacing: -0.01em;
+    }
+    .cs-quote cite {
+      display: block; font-size: 13px; color: var(--muted);
+      font-style: normal; font-weight: 500; margin-top: 10px;
+    }
+    .cs-steps { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
+    .cs-step {
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .cs-step-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--teal);
+      flex-shrink: 0; margin-top: 7px;
+    }
+    .cs-step p { font-size: 15px; color: var(--muted); line-height: 1.6; }
+    .cs-step strong { color: var(--text); font-weight: 600; }
+    .cs-result {
+      background: var(--teal-light); border-left: 3px solid var(--teal);
+      border-radius: 0 var(--r-sm) var(--r-sm) 0; padding: 16px 18px; margin-top: 20px;
+    }
+    .cs-result p { font-size: 15px; color: var(--navy); font-weight: 600; line-height: 1.5; }
+
+    /* CHART */
+    .chart-card {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--r); padding: 28px; box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+    }
+    .chart-title {
+      font-size: 13px; font-weight: 700; color: var(--navy);
+      margin-bottom: 4px; letter-spacing: -0.01em;
+    }
+    .chart-subtitle {
+      font-size: 11px; color: var(--muted); margin-bottom: 24px;
+    }
+    .chart-bars { display: flex; flex-direction: column; gap: 14px; }
+    .chart-row { display: flex; flex-direction: column; gap: 6px; }
+    .chart-row-label {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .chart-channel { font-size: 13px; font-weight: 600; color: var(--text); }
+    .chart-pct { font-size: 13px; font-weight: 700; color: var(--navy); }
+    .chart-bar-track {
+      background: var(--bg); border-radius: 99px; height: 10px; overflow: hidden;
+    }
+    .chart-bar-fill {
+      height: 100%; border-radius: 99px; background: var(--teal);
+      transition: width 1s ease;
+    }
+    .chart-bar-fill.low { background: #94A3B8; }
+    .chart-source {
+      font-size: 11px; color: var(--muted); margin-top: 18px; text-align: right;
+    }
+
+    /* HOW IT WORKS */
+    .how { background: var(--white); }
+    .how-header { max-width: 560px; margin-bottom: 60px; }
+    .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+    .step-card {
+      background: var(--bg); border-radius: var(--r); padding: 32px; position: relative;
+    }
+    .step-num {
+      width: 44px; height: 44px; border-radius: 50%; background: var(--navy);
+      color: var(--white); font-size: 16px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center; margin-bottom: 18px;
+    }
+    .step-card h3 {
+      font-size: 17px; font-weight: 700; color: var(--navy);
+      margin-bottom: 10px; letter-spacing: -0.01em;
+    }
+    .step-card p { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+    /* PRICING */
+    .pricing { background: var(--bg); }
+    .pricing-header { max-width: 560px; margin-bottom: 48px; }
+    .pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 760px; }
+    .pricing-card {
+      border-radius: var(--r); padding: 36px; border: 1.5px solid var(--border);
+      background: var(--white);
+    }
+    .pricing-card.featured {
+      background: var(--navy); border-color: var(--navy);
+    }
+    .pricing-badge {
+      display: inline-block; font-size: 11px; font-weight: 700;
+      background: var(--teal); color: var(--white);
+      padding: 4px 12px; border-radius: 99px; margin-bottom: 16px;
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .pricing-name {
+      font-size: 18px; font-weight: 800; color: var(--white);
+      letter-spacing: -0.02em; margin-bottom: 6px;
+    }
+    .pricing-name-muted {
+      font-size: 18px; font-weight: 800; color: var(--navy);
+      letter-spacing: -0.02em; margin-bottom: 6px;
+    }
+    .pricing-price {
+      display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px;
+    }
+    .price-main { font-size: 48px; font-weight: 800; color: var(--white); letter-spacing: -0.04em; line-height: 1; }
+    .price-main-muted { font-size: 48px; font-weight: 800; color: var(--muted); letter-spacing: -0.04em; line-height: 1; }
+    .price-period { font-size: 15px; color: rgba(255,255,255,0.5); font-weight: 500; }
+    .price-period-muted { font-size: 15px; color: var(--muted); font-weight: 500; }
+    .price-was {
+      font-size: 14px; color: rgba(255,255,255,0.4); margin-bottom: 20px;
+    }
+    .price-was s { text-decoration: line-through; }
+    .pricing-desc {
+      font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.6; margin-bottom: 28px;
+    }
+    .pricing-desc-muted {
+      font-size: 14px; color: var(--muted); line-height: 1.6; margin-bottom: 28px;
+    }
+    .pricing-features { display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px; }
+    .pricing-feature {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.4;
+    }
+    .pricing-feature::before {
+      content: '✓'; color: var(--teal); font-weight: 700; flex-shrink: 0;
+    }
+    .pricing-feature-muted {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 14px; color: var(--muted); line-height: 1.4;
+    }
+    .pricing-feature-muted::before { content: '✓'; color: var(--muted); font-weight: 700; flex-shrink: 0; }
+    .btn-pricing {
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; padding: 14px; border-radius: var(--r-sm);
+      font-size: 15px; font-weight: 700; font-family: inherit;
+      text-decoration: none; border: none; cursor: pointer;
+      background: var(--teal); color: var(--white);
+      transition: background 0.15s, transform 0.15s;
+    }
+    .btn-pricing:hover { background: var(--teal-dark); transform: translateY(-1px); }
+    .btn-pricing-disabled {
+      display: flex; align-items: center; justify-content: center;
+      width: 100%; padding: 14px; border-radius: var(--r-sm);
+      font-size: 15px; font-weight: 600; font-family: inherit;
+      border: 1.5px solid var(--border); color: var(--muted);
+      background: transparent; cursor: default;
+    }
+    .guarantee {
+      max-width: 760px; margin-top: 28px;
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: var(--r); padding: 20px 24px;
+      display: flex; align-items: flex-start; gap: 14px;
+    }
+    .guarantee-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+    .guarantee p { font-size: 14px; color: var(--muted); line-height: 1.6; }
+    .guarantee strong { color: var(--text); font-weight: 600; }
+
+    /* FAQ */
+    .faq { background: var(--white); }
+    .faq-header { max-width: 560px; margin-bottom: 48px; }
+    .faq-list { display: flex; flex-direction: column; gap: 0; max-width: 720px; }
+    .faq-item { border-bottom: 1px solid var(--border); padding: 24px 0; }
+    .faq-item:first-child { border-top: 1px solid var(--border); }
+    .faq-q { font-size: 16px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+    .faq-a { font-size: 15px; color: var(--muted); line-height: 1.7; }
+    .faq-a a { color: var(--teal); text-decoration: none; }
+    .faq-a a:hover { text-decoration: underline; }
+
+    /* FOOTER */
+    footer {
+      background: var(--navy-deep);
+      padding: 32px 0;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+    .footer-inner {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .footer-logo {
+      font-size: 14px; font-weight: 700; color: rgba(255,255,255,0.5);
+      text-decoration: none; letter-spacing: -0.01em;
+    }
+    .footer-logo span { color: var(--teal); }
+    .footer-meta {
+      font-size: 13px; color: rgba(255,255,255,0.3);
+    }
+    .footer-meta a { color: rgba(255,255,255,0.4); text-decoration: none; }
+    .footer-meta a:hover { color: rgba(255,255,255,0.7); }
+
+    /* RESPONSIVE */
+    @media (max-width: 860px) {
+      .cs-inner { grid-template-columns: 1fr; gap: 40px; }
+      .steps-grid { grid-template-columns: 1fr; max-width: 480px; }
+      .pricing-grid { grid-template-columns: 1fr; max-width: 440px; }
+    }
+    @media (max-width: 640px) {
+      section { padding: 64px 0; }
+      .hero { padding: 68px 0 60px; }
+      .nav-links, .nav-actions { display: none; }
+      .nav-toggle { display: flex; }
+      .hero-ctas { flex-direction: column; align-items: stretch; }
+      .hero-ctas .btn-primary, .hero-ctas .btn-outline { text-align: center; }
+      .footer-inner { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="container">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">get<span>headwaters</span>.app</a>
+      <ul class="nav-links">
+        <li><a href="#how">How It Works</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="https://headwaters.streamlit.app" target="_blank" class="btn-ghost">Try Free Sample</a>
+        <a href="checkout.html" class="btn-nav-cta">Get Access — $297</a>
+      </div>
+      <button class="nav-toggle" onclick="toggleMenu()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#how" onclick="toggleMenu()">How It Works</a>
+    <a href="#pricing" onclick="toggleMenu()">Pricing</a>
+    <a href="https://headwaters.streamlit.app" target="_blank">Try Free Sample</a>
+    <a href="checkout.html" class="btn-nav-cta">Get Access — $297/year</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <span class="hero-eyebrow">Marketing Mix Modeling for Tourism &amp; Hospitality</span>
+    <h1>Find out which marketing channels are actually driving your bookings.</h1>
+    <p class="hero-sub">Headwaters is a marketing mix modeling tool built for tourism and hospitality businesses. Upload your data. See the truth.</p>
+    <div class="hero-ctas">
+      <a href="https://headwaters.streamlit.app" target="_blank" class="btn-outline">Try with sample data →</a>
+      <a href="checkout.html" class="btn-primary">Get Access — $297/year →</a>
+    </div>
+    <p class="hero-note">Founding member price — first 25 seats only. Full price $497/year.</p>
+  </div>
+</section>
+
+<!-- CASE STUDY -->
+<section class="case-study" id="case-study">
+  <div class="container">
+    <div class="cs-inner">
+      <div>
+        <p class="eyebrow">Real Result</p>
+        <h2>From guessing to knowing — in one season.</h2>
+        <div class="cs-quote">
+          <p>"We were spending $4,400 a month across Google, Facebook, and TripAdvisor. We had no idea which one was filling our rooms and which one was burning money."</p>
+          <cite>— Birch Hill Inn, Center Harbor NH</cite>
+        </div>
+        <div class="cs-steps">
+          <div class="cs-step">
+            <div class="cs-step-dot"></div>
+            <p><strong>What Headwaters showed:</strong> Google Search was driving 71% of booking revenue. Facebook was contributing less than 4%.</p>
+          </div>
+          <div class="cs-step">
+            <div class="cs-step-dot"></div>
+            <p><strong>The decision:</strong> Cut Facebook spend by 75%, moved the budget to search and email.</p>
+          </div>
+        </div>
+        <div class="cs-result">
+          <p>"We finished the season with the same booking volume and spent $1,200 less per month on marketing."</p>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Channel Contribution Analysis</div>
+        <div class="chart-subtitle">Birch Hill Inn · Summer 2024 Season</div>
+        <div class="chart-bars">
+          <div class="chart-row">
+            <div class="chart-row-label">
+              <span class="chart-channel">Google Search</span>
+              <span class="chart-pct">71%</span>
+            </div>
+            <div class="chart-bar-track">
+              <div class="chart-bar-fill" style="width:71%"></div>
+            </div>
+          </div>
+          <div class="chart-row">
+            <div class="chart-row-label">
+              <span class="chart-channel">TripAdvisor</span>
+              <span class="chart-pct">19%</span>
+            </div>
+            <div class="chart-bar-track">
+              <div class="chart-bar-fill" style="width:19%"></div>
+            </div>
+          </div>
+          <div class="chart-row">
+            <div class="chart-row-label">
+              <span class="chart-channel">Email</span>
+              <span class="chart-pct">6%</span>
+            </div>
+            <div class="chart-bar-track">
+              <div class="chart-bar-fill" style="width:6%"></div>
+            </div>
+          </div>
+          <div class="chart-row">
+            <div class="chart-row-label">
+              <span class="chart-channel">Facebook</span>
+              <span class="chart-pct">4%</span>
+            </div>
+            <div class="chart-bar-track">
+              <div class="chart-bar-fill low" style="width:4%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-source">Source: Headwaters analysis · Summer 2024</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="container">
+    <div class="how-header">
+      <p class="eyebrow">How It Works</p>
+      <h2>Three steps from data to decision.</h2>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <h3>Upload your data</h3>
+        <p>Export your marketing spend by channel and your booking or revenue numbers by week or month. We provide a CSV template so you know exactly what format to use.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <h3>Run the model</h3>
+        <p>Headwaters runs a marketing mix model on your data in under 60 seconds. No technical setup. No waiting on an analyst. Upload and go.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <h3>See your channel attribution</h3>
+        <p>You get a clear visual breakdown showing exactly which channels drove your bookings — and which ones didn't. Use it to make your next budget decision with confidence.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="container">
+    <div class="pricing-header">
+      <p class="eyebrow">Pricing</p>
+      <h2>One straightforward price. One clear outcome.</h2>
+    </div>
+    <div class="pricing-grid">
+      <div class="pricing-card featured">
+        <div class="pricing-badge">Founding Member</div>
+        <div class="pricing-name">Annual Access</div>
+        <div class="pricing-price">
+          <span class="price-main">$297</span>
+          <span class="price-period">/year</span>
+        </div>
+        <div class="price-was">Was <s>$497</s> — first 25 seats only</div>
+        <div class="pricing-features">
+          <div class="pricing-feature">Upload your own marketing data</div>
+          <div class="pricing-feature">Full channel attribution analysis</div>
+          <div class="pricing-feature">Season-over-season comparison</div>
+          <div class="pricing-feature">CSV data template included</div>
+          <div class="pricing-feature">15-minute onboarding call with Matthew</div>
+        </div>
+        <a href="checkout.html" class="btn-pricing">Get Access Now →</a>
+      </div>
+      <div class="pricing-card">
+        <div class="pricing-name-muted">Full Price</div>
+        <div class="pricing-price">
+          <span class="price-main-muted">$497</span>
+          <span class="price-period-muted">/year</span>
+        </div>
+        <div class="pricing-desc-muted" style="margin-top:6px;">Available after the founding cohort of 25 closes.</div>
+        <div style="height: 20px;"></div>
+        <div class="pricing-feature-muted">Upload your own marketing data</div>
+        <div class="pricing-feature-muted" style="margin-top:10px;">Full channel attribution analysis</div>
+        <div class="pricing-feature-muted" style="margin-top:10px;">Season-over-season comparison</div>
+        <div class="pricing-feature-muted" style="margin-top:10px;">CSV data template included</div>
+        <div style="height: 28px; margin-top: 20px;"></div>
+        <div class="btn-pricing-disabled">Not yet available</div>
+      </div>
+    </div>
+    <div class="guarantee">
+      <div class="guarantee-icon">🛡</div>
+      <p><strong>30-day money-back guarantee.</strong> If Headwaters doesn't show you something actionable about your marketing in the first 30 days, we'll refund every dollar. No questions asked.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="container">
+    <div class="faq-header">
+      <p class="eyebrow">FAQ</p>
+      <h2>Common questions.</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">What data do I need?</div>
+        <div class="faq-a">A CSV with your marketing spend by channel and your booking or revenue numbers by week or month. We provide a template so you know exactly how to format it before you upload anything.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How long does it take?</div>
+        <div class="faq-a">Under 60 seconds once your data is uploaded. The model runs automatically — no waiting, no back and forth with an analyst.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What if I need help?</div>
+        <div class="faq-a">Email <a href="mailto:matt@matthewalighieri.com">matt@matthewalighieri.com</a> or book a call at <a href="https://calendly.com/matthewalighieri/30min" target="_blank">calendly.com/matthewalighieri/30min</a>. Every founding member gets a 15-minute onboarding call included.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <a href="/" class="footer-logo">get<span>headwaters</span>.app</a>
+      <p class="footer-meta">Built by <a href="https://newenglandgrowthstudio.com" target="_blank">New England Growth Studio</a></p>
+      <p class="footer-meta"><a href="mailto:matt@matthewalighieri.com">matt@matthewalighieri.com</a></p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function toggleMenu() {
+    document.getElementById('mobileMenu').classList.toggle('open');
+  }
+  document.addEventListener('click', function(e) {
+    const menu = document.getElementById('mobileMenu');
+    const toggle = document.querySelector('.nav-toggle');
+    if (menu.classList.contains('open') && !menu.contains(e.target) && !toggle.contains(e.target)) {
+      menu.classList.remove('open');
+    }
+  });
+</script>
+
+</body>
+</html>

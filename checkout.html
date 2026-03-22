@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Get Access — Headwaters</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #0F2340; --teal: #00B896; --teal-dark: #009E82;
+      --teal-light: #E8FBF7; --bg: #F8FAFC; --white: #FFFFFF;
+      --text: #1E293B; --muted: #64748B; --border: #E2E8F0;
+      --error: #DC2626;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; display: flex; flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+    }
+    nav {
+      background: var(--white); border-bottom: 1px solid var(--border);
+      padding: 0 24px; height: 60px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo {
+      font-size: 15px; font-weight: 800; color: var(--navy);
+      text-decoration: none; letter-spacing: -0.02em;
+    }
+    .nav-logo span { color: var(--teal); }
+    .nav-back {
+      font-size: 14px; font-weight: 500; color: var(--muted);
+      text-decoration: none; transition: color 0.15s;
+    }
+    .nav-back:hover { color: var(--navy); }
+    .page {
+      flex: 1; display: flex; align-items: flex-start;
+      justify-content: center; padding: 48px 16px;
+    }
+    .checkout-wrap {
+      display: grid; grid-template-columns: 1fr 420px;
+      gap: 40px; width: 100%; max-width: 860px; align-items: start;
+    }
+    .order-summary {
+      background: var(--navy); border-radius: 16px; padding: 36px;
+    }
+    .summary-badge {
+      display: inline-block; font-size: 11px; font-weight: 700;
+      background: var(--teal); color: var(--white);
+      padding: 4px 12px; border-radius: 99px; margin-bottom: 20px;
+      text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .summary-name {
+      font-size: 22px; font-weight: 800; color: var(--white);
+      letter-spacing: -0.02em; margin-bottom: 8px; line-height: 1.25;
+    }
+    .summary-desc {
+      font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.65; margin-bottom: 28px;
+    }
+    .summary-divider { border: none; border-top: 1px solid rgba(255,255,255,0.1); margin-bottom: 24px; }
+    .summary-line {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 12px;
+    }
+    .summary-line-label { font-size: 14px; color: rgba(255,255,255,0.55); }
+    .summary-line-value { font-size: 14px; color: var(--white); font-weight: 600; }
+    .summary-total {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.15);
+    }
+    .summary-total-label { font-size: 15px; color: var(--white); font-weight: 700; }
+    .summary-total-value { font-size: 28px; font-weight: 800; color: var(--teal); letter-spacing: -0.03em; }
+    .summary-features { display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
+    .summary-feature {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 13px; color: rgba(255,255,255,0.65); line-height: 1.45;
+    }
+    .summary-feature::before { content: '✓'; color: var(--teal); font-weight: 700; flex-shrink: 0; }
+    .checkout-form-card {
+      background: var(--white); border-radius: 16px;
+      padding: 36px; border: 1.5px solid var(--border);
+    }
+    .form-title {
+      font-size: 20px; font-weight: 800; color: var(--navy);
+      letter-spacing: -0.02em; margin-bottom: 28px;
+    }
+    .form-group { margin-bottom: 18px; }
+    .form-label {
+      display: block; font-size: 13px; font-weight: 600;
+      color: var(--text); margin-bottom: 7px;
+    }
+    .form-input {
+      width: 100%; padding: 13px 14px;
+      border: 1.5px solid var(--border); border-radius: 9px;
+      font-size: 15px; font-family: inherit; color: var(--text);
+      background: var(--white); transition: border-color 0.15s;
+    }
+    .form-input:focus { outline: none; border-color: var(--teal); }
+    .form-input.error { border-color: var(--error); }
+    .err-msg {
+      font-size: 12px; color: var(--error); margin-top: 5px; display: none;
+    }
+    .err-msg.visible { display: block; }
+    .submit-btn {
+      width: 100%; padding: 15px; border-radius: 9px;
+      background: var(--teal); color: var(--white);
+      font-size: 16px; font-weight: 700; font-family: inherit;
+      border: none; cursor: pointer; transition: background 0.15s, transform 0.15s;
+      margin-top: 8px;
+    }
+    .submit-btn:hover:not(:disabled) { background: var(--teal-dark); transform: translateY(-1px); }
+    .submit-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+    .submit-note {
+      font-size: 12px; color: var(--muted); text-align: center;
+      margin-top: 12px; line-height: 1.5;
+    }
+    .global-err {
+      background: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px;
+      padding: 12px 14px; font-size: 13px; color: var(--error);
+      margin-bottom: 16px; display: none;
+    }
+    .global-err.visible { display: block; }
+    .secure-badges {
+      display: flex; align-items: center; justify-content: center;
+      gap: 16px; margin-top: 20px; padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    .secure-badge { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+    @media (max-width: 720px) {
+      .checkout-wrap { grid-template-columns: 1fr; }
+      .order-summary { order: 2; }
+      .checkout-form-card { order: 1; }
+      .page { padding: 24px 16px; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">get<span>headwaters</span>.app</a>
+  <a href="/" class="nav-back">← Back</a>
+</nav>
+
+<div class="page">
+  <div class="checkout-wrap">
+
+    <div class="order-summary">
+      <div class="summary-badge">Founding Member</div>
+      <div class="summary-name">Headwaters — Annual Access</div>
+      <div class="summary-desc">Marketing mix modeling for tourism &amp; hospitality businesses. Know which channels are driving your bookings.</div>
+      <hr class="summary-divider">
+      <div class="summary-line">
+        <span class="summary-line-label">Billing</span>
+        <span class="summary-line-value">Annual</span>
+      </div>
+      <div class="summary-line">
+        <span class="summary-line-label">Regular price</span>
+        <span class="summary-line-value" style="text-decoration:line-through;color:rgba(255,255,255,0.35);">$497/yr</span>
+      </div>
+      <div class="summary-total">
+        <span class="summary-total-label">Today's charge</span>
+        <span class="summary-total-value">$297</span>
+      </div>
+      <div class="summary-features">
+        <div class="summary-feature">Upload your own marketing data</div>
+        <div class="summary-feature">Full channel attribution analysis</div>
+        <div class="summary-feature">Season-over-season comparison</div>
+        <div class="summary-feature">CSV data template included</div>
+        <div class="summary-feature">15-min onboarding call with Matthew</div>
+        <div class="summary-feature">30-day money-back guarantee</div>
+      </div>
+    </div>
+
+    <div class="checkout-form-card">
+      <div class="form-title">Complete your order</div>
+      <div class="global-err" id="global-err"></div>
+      <form id="checkout-form" onsubmit="handleSubmit(event)">
+        <div class="form-group">
+          <label class="form-label" for="name">Full name</label>
+          <input class="form-input" type="text" id="name" name="name" placeholder="Jane Smith" autocomplete="name" required>
+          <div class="err-msg" id="name-err">Please enter your name.</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="email">Email address</label>
+          <input class="form-input" type="email" id="email" name="email" placeholder="jane@yourbusiness.com" autocomplete="email" required>
+          <div class="err-msg" id="email-err">Please enter a valid email address.</div>
+        </div>
+        <button class="submit-btn" type="submit" id="submit-btn">
+          Continue to Payment →
+        </button>
+        <p class="submit-note">Your card will be charged $297.00 today. Cancel anytime.</p>
+        <div class="secure-badges">
+          <span class="secure-badge">🔒 Secured by Stripe</span>
+          <span class="secure-badge">🛡 30-day guarantee</span>
+        </div>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    const name  = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const btn   = document.getElementById('submit-btn');
+    const globalErr = document.getElementById('global-err');
+    let valid = true;
+
+    // Validate
+    if (!name) {
+      document.getElementById('name-err').classList.add('visible');
+      document.getElementById('name').classList.add('error');
+      valid = false;
+    } else {
+      document.getElementById('name-err').classList.remove('visible');
+      document.getElementById('name').classList.remove('error');
+    }
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      document.getElementById('email-err').classList.add('visible');
+      document.getElementById('email').classList.add('error');
+      valid = false;
+    } else {
+      document.getElementById('email-err').classList.remove('visible');
+      document.getElementById('email').classList.remove('error');
+    }
+    if (!valid) return;
+
+    btn.disabled = true;
+    btn.textContent = 'Redirecting to payment...';
+    globalErr.classList.remove('visible');
+
+    try {
+      const res = await fetch('/.netlify/functions/create-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email })
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error(data.error || 'Could not create checkout session.');
+      }
+    } catch (err) {
+      globalErr.textContent = 'Something went wrong: ' + err.message + ' Please try again or email matt@matthewalighieri.com.';
+      globalErr.classList.add('visible');
+      btn.disabled = false;
+      btn.textContent = 'Continue to Payment →';
+    }
+  }
+</script>
+
+</body>
+</html>

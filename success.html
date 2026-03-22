@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>You're in — Headwaters</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #0F2340; --teal: #00B896; --teal-dark: #009E82;
+      --teal-light: #E8FBF7; --bg: #F8FAFC; --white: #FFFFFF;
+      --text: #1E293B; --muted: #64748B; --border: #E2E8F0;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg); color: var(--text);
+      min-height: 100vh; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 32px 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .card {
+      background: var(--white); border-radius: 20px;
+      border: 1.5px solid var(--border); padding: 52px 48px;
+      max-width: 560px; width: 100%; text-align: center;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+    }
+    .check-icon {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: var(--teal-light); display: flex; align-items: center;
+      justify-content: center; margin: 0 auto 28px; font-size: 28px;
+    }
+    h1 {
+      font-size: 28px; font-weight: 800; color: var(--navy);
+      letter-spacing: -0.025em; margin-bottom: 10px; line-height: 1.2;
+    }
+    .sub {
+      font-size: 16px; color: var(--muted); line-height: 1.65; margin-bottom: 36px;
+    }
+    .next-steps {
+      background: var(--bg); border-radius: 12px; padding: 24px;
+      text-align: left; margin-bottom: 32px;
+    }
+    .next-steps-title {
+      font-size: 12px; font-weight: 700; color: var(--teal);
+      text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 16px;
+    }
+    .next-step {
+      display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px;
+    }
+    .next-step:last-child { margin-bottom: 0; }
+    .step-num {
+      width: 24px; height: 24px; border-radius: 50%; background: var(--navy);
+      color: var(--white); font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .step-text { font-size: 14px; color: var(--text); line-height: 1.55; }
+    .step-text a { color: var(--teal); text-decoration: none; font-weight: 600; }
+    .step-text a:hover { text-decoration: underline; }
+    .btn-go {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--teal); color: var(--white);
+      font-size: 16px; font-weight: 700; padding: 15px 32px;
+      border-radius: 10px; text-decoration: none; font-family: inherit;
+      transition: background 0.15s, transform 0.15s; width: 100%;
+    }
+    .btn-go:hover { background: var(--teal-dark); transform: translateY(-1px); }
+    .footer-note {
+      font-size: 13px; color: var(--muted); margin-top: 20px;
+    }
+    .footer-note a { color: var(--muted); }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="check-icon">✓</div>
+    <h1>You're in. Welcome to Headwaters.</h1>
+    <p class="sub">Your founding member access is confirmed. Here's what happens next.</p>
+
+    <div class="next-steps">
+      <div class="next-steps-title">What happens next</div>
+      <div class="next-step">
+        <div class="step-num">1</div>
+        <div class="step-text">Check your email for login instructions and your receipt. It should arrive within a few minutes.</div>
+      </div>
+      <div class="next-step">
+        <div class="step-num">2</div>
+        <div class="step-text">Download the <strong>CSV data template</strong> — it shows you exactly how to format your marketing spend and booking data before you upload.</div>
+      </div>
+      <div class="next-step">
+        <div class="step-num">3</div>
+        <div class="step-text">Book your <strong>15-minute onboarding call</strong> with Matthew at <a href="https://calendly.com/matthewalighieri/30min" target="_blank">calendly.com/matthewalighieri/30min</a>. Included with founding member access.</div>
+      </div>
+    </div>
+
+    <a href="https://headwaters.streamlit.app" target="_blank" class="btn-go">Go to Headwaters →</a>
+
+    <p class="footer-note">Questions? Email <a href="mailto:matt@matthewalighieri.com">matt@matthewalighieri.com</a></p>
+  </div>
+
+</body>
+</html>
