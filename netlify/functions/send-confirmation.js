@@ -1,7 +1,7 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 const CALENDLY = 'https://calendly.com/matthewalighieri/30min';
-const APP_URL  = 'https://headwaters.streamlit.app';
+const APP_URL  = 'https://getheadwaters.app';
 
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
@@ -64,13 +64,16 @@ exports.handler = async (event) => {
               <div style="background:#F8FAFC;border-radius:10px;padding:20px 24px;margin-bottom:24px;">
                 <p style="font-size:12px;font-weight:700;color:#00B896;text-transform:uppercase;letter-spacing:0.1em;margin:0 0 14px;">Next steps</p>
                 <p style="font-size:14px;color:#1E293B;margin:0 0 12px;line-height:1.55;">
-                  <strong>1. Go to Headwaters</strong> — upload your marketing data and run your first analysis.
+                  <strong>1. Go to Headwaters</strong> — log in and start your first analysis session.
                 </p>
                 <p style="font-size:14px;color:#1E293B;margin:0 0 12px;line-height:1.55;">
-                  <strong>2. Download the CSV template</strong> — it shows you exactly how to format your spend and booking data.
+                  <strong>2. Download the CSV template</strong> — inside the app, click "Download Template" to get the exact format for your marketing spend and booking data. Two columns: date and spend per channel. That's it.
+                </p>
+                <p style="font-size:14px;color:#1E293B;margin:0 0 12px;line-height:1.55;">
+                  <strong>3. Upload your data</strong> — drag your completed CSV into Headwaters and run your first model. Most members have results in under 5 minutes.
                 </p>
                 <p style="font-size:14px;color:#1E293B;margin:0;line-height:1.55;">
-                  <strong>3. Book your onboarding call</strong> — every founding member gets 15 minutes with Matthew to walk through setup and your first analysis.
+                  <strong>4. Book your onboarding call</strong> — every founding member gets 15 minutes with Matthew to walk through setup and review your first results together.
                 </p>
               </div>
               <div style="display:flex;flex-direction:column;gap:10px;">
