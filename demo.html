@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Headwaters Demo — Birch Hill Inn</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:        #070D19;
+      --surface:   #0C1829;
+      --surface-2: #111F34;
+      --teal:      #39FF14;
+      --teal-dark: #2EE010;
+      --white:     #FFFFFF;
+      --text:      #F1F5F9;
+      --muted:     #94A3B8;
+      --border:    rgba(255,255,255,0.08);
+      --max-w:     1040px;
+      --r:         14px;
+      --r-sm:      10px;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(57,255,20,0.05) 0%, transparent 65%);
+      pointer-events: none; z-index: 0;
+    }
+    #starfield { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    .container { width: 100%; max-width: var(--max-w); margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(7,13,25,0.9);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 62px; }
+    .nav-logo { font-size: 15px; font-weight: 800; color: var(--white); letter-spacing: -0.02em; text-decoration: none; }
+    .nav-logo span { color: var(--teal); }
+    .nav-demo-badge {
+      font-size: 11px; font-weight: 700; color: var(--teal); background: rgba(57,255,20,0.1);
+      border: 1px solid rgba(57,255,20,0.25); border-radius: 99px; padding: 4px 12px;
+      text-transform: uppercase; letter-spacing: 0.1em;
+    }
+    .btn-nav {
+      font-size: 14px; font-weight: 700; color: #07111F;
+      background: var(--teal); padding: 9px 18px; border-radius: var(--r-sm);
+      text-decoration: none; transition: background 0.15s, transform 0.15s; white-space: nowrap;
+    }
+    .btn-nav:hover { background: var(--teal-dark); transform: translateY(-1px); }
+
+    /* HERO */
+    .hero { padding: 80px 0 60px; text-align: center; position: relative; z-index: 1; }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-size: 11px; font-weight: 800; color: var(--teal);
+      text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 24px;
+    }
+    .hero-eyebrow::before {
+      content: ''; display: block; width: 20px; height: 2px;
+      background: var(--teal); border-radius: 2px;
+    }
+    .hero-eyebrow::after {
+      content: ''; display: block; width: 20px; height: 2px;
+      background: var(--teal); border-radius: 2px;
+    }
+    .hero h1 {
+      font-size: clamp(32px, 5vw, 52px); font-weight: 900; color: var(--white);
+      line-height: 1.1; letter-spacing: -0.04em; margin-bottom: 18px;
+    }
+    .hero h1 em { font-style: normal; color: var(--teal); }
+    .hero-sub {
+      font-size: 17px; color: var(--muted); line-height: 1.65;
+      max-width: 520px; margin: 0 auto 16px;
+    }
+    .hero-disclaimer { font-size: 13px; color: rgba(255,255,255,0.22); margin-top: 10px; }
+
+    /* CONTEXT CARD */
+    .context-section { padding: 0 0 56px; position: relative; z-index: 1; }
+    .context-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--teal);
+      border-radius: var(--r);
+      padding: 28px 32px;
+      display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 32px;
+    }
+    .context-item {}
+    .context-label { font-size: 11px; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; }
+    .context-value { font-size: 18px; font-weight: 800; color: var(--white); letter-spacing: -0.02em; }
+    .context-sub { font-size: 13px; color: var(--muted); margin-top: 3px; }
+
+    /* STATS */
+    .stats { padding: 0 0 64px; position: relative; z-index: 1; }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r-sm); padding: 24px;
+      text-align: center;
+    }
+    .stat-value { font-size: 32px; font-weight: 900; color: var(--teal); letter-spacing: -0.04em; line-height: 1; margin-bottom: 6px; }
+    .stat-label { font-size: 12px; color: var(--muted); font-weight: 500; line-height: 1.4; }
+
+    /* SECTION STRUCTURE */
+    .section { padding: 0 0 64px; position: relative; z-index: 1; }
+    .section-eyebrow {
+      font-size: 11px; font-weight: 800; color: var(--teal);
+      text-transform: uppercase; letter-spacing: 0.12em; margin-bottom: 10px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-eyebrow::before { content: ''; display: block; width: 16px; height: 2px; background: var(--teal); border-radius: 2px; }
+    .section-title { font-size: clamp(22px, 3vw, 32px); font-weight: 900; color: var(--white); letter-spacing: -0.03em; margin-bottom: 10px; line-height: 1.18; }
+    .section-body { font-size: 15px; color: var(--muted); line-height: 1.7; max-width: 580px; margin-bottom: 32px; }
+
+    /* CHART CARDS */
+    .chart-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--r); padding: 32px;
+    }
+    .chart-header { margin-bottom: 28px; }
+    .chart-title { font-size: 16px; font-weight: 800; color: var(--white); letter-spacing: -0.02em; margin-bottom: 4px; }
+    .chart-subtitle { font-size: 12px; color: var(--muted); }
+    .chart-canvas-wrap { position: relative; width: 100%; }
+
+    /* CHANNEL ANNOTATION */
+    .channel-annotation {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 28px;
+    }
+    .ann-item {
+      background: var(--surface-2); border-radius: var(--r-sm);
+      padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+    }
+    .ann-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .ann-channel { font-size: 13px; font-weight: 600; color: var(--text); }
+    .ann-pct { font-size: 20px; font-weight: 900; color: var(--white); letter-spacing: -0.03em; }
+    .ann-note { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .ann-winner .ann-channel { color: var(--teal); }
+
+    /* DECISION CALLOUT */
+    .decision { padding: 0 0 64px; position: relative; z-index: 1; }
+    .decision-card {
+      background: linear-gradient(135deg, rgba(12,24,41,0.98), rgba(57,255,20,0.04));
+      border: 1px solid rgba(57,255,20,0.2);
+      border-radius: var(--r); padding: 36px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 40px;
+    }
+    .decision-quote {
+      border-left: 3px solid var(--teal); padding-left: 20px;
+    }
+    .decision-q {
+      font-size: 17px; font-style: italic; font-weight: 600; color: var(--white);
+      line-height: 1.6; letter-spacing: -0.01em; margin-bottom: 14px;
+    }
+    .decision-cite { font-size: 13px; color: var(--muted); font-weight: 500; }
+    .decision-steps { display: flex; flex-direction: column; gap: 16px; }
+    .decision-step { display: flex; align-items: flex-start; gap: 14px; }
+    .decision-step-num {
+      width: 28px; height: 28px; border-radius: 50%; background: rgba(57,255,20,0.12);
+      color: var(--teal); font-size: 12px; font-weight: 800;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+    }
+    .decision-step-text { font-size: 14px; color: var(--muted); line-height: 1.6; }
+    .decision-step-text strong { color: var(--white); font-weight: 700; }
+    .result-callout {
+      background: rgba(57,255,20,0.08); border: 1px solid rgba(57,255,20,0.22);
+      border-radius: var(--r-sm); padding: 16px 20px; margin-top: 20px;
+    }
+    .result-callout p { font-size: 15px; color: var(--white); font-weight: 700; line-height: 1.5; }
+    .result-callout span { color: var(--teal); }
+
+    /* ACCURACY CHART LEGEND */
+    .chart-legend { display: flex; gap: 20px; margin-top: 16px; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); }
+    .legend-line { width: 24px; height: 3px; border-radius: 2px; }
+
+    /* CTA */
+    .cta-section {
+      padding: 64px 0 88px; text-align: center; position: relative; z-index: 1;
+    }
+    .cta-eyebrow {
+      font-size: 11px; font-weight: 800; color: var(--teal);
+      text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 20px;
+    }
+    .cta-title { font-size: clamp(28px, 4vw, 44px); font-weight: 900; color: var(--white); letter-spacing: -0.04em; line-height: 1.1; margin-bottom: 16px; }
+    .cta-title em { font-style: normal; color: var(--teal); }
+    .cta-sub { font-size: 17px; color: var(--muted); max-width: 480px; margin: 0 auto 36px; line-height: 1.65; }
+    .btn-cta {
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--teal); color: #07111F; font-size: 17px; font-weight: 800;
+      padding: 18px 40px; border-radius: var(--r-sm); text-decoration: none;
+      transition: all 0.2s; letter-spacing: -0.01em;
+      box-shadow: 0 6px 32px rgba(57,255,20,0.35);
+    }
+    .btn-cta:hover { background: var(--teal-dark); transform: translateY(-3px); box-shadow: 0 12px 40px rgba(57,255,20,0.5); }
+    .cta-note { font-size: 13px; color: rgba(255,255,255,0.25); margin-top: 16px; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border); padding: 24px 0;
+      text-align: center; font-size: 12px; color: rgba(255,255,255,0.2);
+      position: relative; z-index: 1;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 760px) {
+      .context-card { grid-template-columns: 1fr; gap: 20px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .decision-card { grid-template-columns: 1fr; gap: 28px; }
+      .channel-annotation { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="container">
+    <div class="nav-inner">
+      <a href="https://getheadwaters.app" class="nav-logo">get<span>headwaters</span>.app</a>
+      <span class="nav-demo-badge">Live Demo</span>
+      <a href="https://getheadwaters.app" class="btn-nav">Get Access — $297 →</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">Real Data · Real Business · Real Decision</div>
+    <h1>This is what Headwaters<br>shows <em>your business.</em></h1>
+    <p class="hero-sub">Below is a live walkthrough using actual marketing data from Birch Hill Inn in Center Harbor, NH. This is exactly what you get when you upload your data.</p>
+    <p class="hero-disclaimer">Data used with permission. Analysis runs in under 60 seconds.</p>
+  </div>
+</section>
+
+<!-- CONTEXT -->
+<section class="context-section">
+  <div class="container">
+    <div class="context-card">
+      <div class="context-item">
+        <div class="context-label">Business</div>
+        <div class="context-value">Birch Hill Inn</div>
+        <div class="context-sub">Boutique Inn · Center Harbor, NH</div>
+      </div>
+      <div class="context-item">
+        <div class="context-label">Season Analyzed</div>
+        <div class="context-value">Summer 2024</div>
+        <div class="context-sub">May — September (peak season)</div>
+      </div>
+      <div class="context-item">
+        <div class="context-label">Monthly Marketing Spend</div>
+        <div class="context-value">$4,400 / month</div>
+        <div class="context-sub">Google, Facebook, TripAdvisor, Email</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value">$4,400</div>
+        <div class="stat-label">Monthly spend analyzed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">4</div>
+        <div class="stat-label">Marketing channels tracked</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">97.2%</div>
+        <div class="stat-label">Model accuracy (R²)</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">$1,200</div>
+        <div class="stat-label">Monthly budget freed up</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHART 1: CHANNEL ATTRIBUTION -->
+<section class="section">
+  <div class="container">
+    <div class="section-eyebrow">Finding 1</div>
+    <h2 class="section-title">Which channels are actually driving bookings?</h2>
+    <p class="section-body">Headwaters ran a marketing mix model on Birch Hill Inn's data. Here is the channel contribution breakdown — which percentage of their booking revenue can be attributed to each marketing channel.</p>
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">Channel Contribution to Booking Revenue</div>
+        <div class="chart-subtitle">Birch Hill Inn · Summer 2024 · Based on actual spend and booking data</div>
+      </div>
+      <div class="chart-canvas-wrap" style="height: 280px;">
+        <canvas id="barChart"></canvas>
+      </div>
+      <div class="channel-annotation">
+        <div class="ann-item ann-winner">
+          <div class="ann-dot" style="background:#39FF14;box-shadow:0 0 8px #39FF14;"></div>
+          <div>
+            <div class="ann-pct">71%</div>
+            <div class="ann-channel">Google Search</div>
+            <div class="ann-note">Primary driver — every dollar here worked hard</div>
+          </div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-dot" style="background:#00B8FF;"></div>
+          <div>
+            <div class="ann-pct">19%</div>
+            <div class="ann-channel">TripAdvisor</div>
+            <div class="ann-note">Solid secondary channel</div>
+          </div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-dot" style="background:#9F7AEA;"></div>
+          <div>
+            <div class="ann-pct">6%</div>
+            <div class="ann-channel">Email</div>
+            <div class="ann-note">High ROI per dollar spent</div>
+          </div>
+        </div>
+        <div class="ann-item">
+          <div class="ann-dot" style="background:#475569;"></div>
+          <div>
+            <div class="ann-pct">4%</div>
+            <div class="ann-channel">Facebook</div>
+            <div class="ann-note">Highest spend, lowest return</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DECISION -->
+<section class="decision">
+  <div class="container">
+    <div class="decision-card">
+      <div class="decision-quote">
+        <p class="decision-q">"We were spending $4,400 a month across Google, Facebook, and TripAdvisor. We had no idea which one was filling our rooms and which one was burning money."</p>
+        <p class="decision-cite">— Birch Hill Inn, Center Harbor NH</p>
+      </div>
+      <div>
+        <div class="section-eyebrow" style="margin-bottom:18px;">What they did about it</div>
+        <div class="decision-steps">
+          <div class="decision-step">
+            <div class="decision-step-num">1</div>
+            <p class="decision-step-text"><strong>Cut Facebook spend by 75%.</strong> It was consuming a significant budget share while driving less than 4% of bookings.</p>
+          </div>
+          <div class="decision-step">
+            <div class="decision-step-num">2</div>
+            <p class="decision-step-text"><strong>Moved the freed budget into Google Search and email.</strong> The model confirmed these had the highest return per dollar spent.</p>
+          </div>
+          <div class="decision-step">
+            <div class="decision-step-num">3</div>
+            <p class="decision-step-text"><strong>Monitored the next season.</strong> Ran Headwaters again at end of season to validate the decision.</p>
+          </div>
+        </div>
+        <div class="result-callout">
+          <p>"Finished the season with the same booking volume and spent <span>$1,200 less per month</span> on marketing."</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHART 2: ACTUAL VS PREDICTED -->
+<section class="section">
+  <div class="container">
+    <div class="section-eyebrow">Finding 2</div>
+    <h2 class="section-title">How well does the model fit your real data?</h2>
+    <p class="section-body">The chart below shows Birch Hill Inn's actual monthly bookings (solid line) vs. what the Headwaters model predicted (dashed line). The closer these lines are, the more reliable the attribution analysis.</p>
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">Actual Bookings vs. Model Prediction</div>
+        <div class="chart-subtitle">Birch Hill Inn · January–December 2024 · Monthly booking count</div>
+      </div>
+      <div class="chart-canvas-wrap" style="height: 320px;">
+        <canvas id="lineChart"></canvas>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item">
+          <div class="legend-line" style="background:#39FF14;"></div>
+          Actual bookings
+        </div>
+        <div class="legend-item">
+          <div class="legend-line" style="background:#6366F1;border-top:3px dashed #6366F1;height:0;"></div>
+          Model prediction
+        </div>
+      </div>
+      <div style="margin-top:20px;background:rgba(57,255,20,0.06);border:1px solid rgba(57,255,20,0.18);border-radius:10px;padding:14px 18px;">
+        <span style="font-size:13px;color:var(--muted);">Model fit (R²): </span>
+        <span style="font-size:15px;font-weight:800;color:var(--teal);">0.972</span>
+        <span style="font-size:13px;color:var(--muted);margin-left:12px;">— High confidence. The model closely tracks actual booking patterns season-over-season.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-eyebrow">Your Data. Your Business. Your Decision.</div>
+    <h2 class="cta-title">Get this analysis for<br><em>your business.</em></h2>
+    <p class="cta-sub">Upload your marketing spend and booking data. Headwaters runs your model in under 60 seconds. You'll know exactly which channels are working.</p>
+    <a href="https://getheadwaters.app" class="btn-cta">Get Access to Headwaters — $297 →</a>
+    <p class="cta-note">Founding member price. First 25 seats only. 30-day money-back guarantee.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <a href="https://getheadwaters.app" style="color:rgba(255,255,255,0.3);text-decoration:none;font-weight:700;">get<span style="color:#39FF14;">headwaters</span>.app</a>
+    &nbsp;·&nbsp; Built by New England Growth Studio
+  </div>
+</footer>
+
+<script>
+  // ── Starfield ──────────────────────────────────────────────────────────────
+  (function () {
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    resize(); window.addEventListener('resize', resize);
+    const stars = Array.from({ length: 130 }, () => ({
+      x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight,
+      r: Math.random() * 1.0 + 0.2, speed: Math.random() * 0.1 + 0.03,
+      opacity: Math.random() * 0.6 + 0.2, twinkle: Math.random() * Math.PI * 2,
+      twinkleSpeed: Math.random() * 0.016 + 0.004
+    }));
+    const meteors = [];
+    function spawnMeteor() {
+      meteors.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height * 0.4,
+        length: Math.random() * 120 + 60, speed: Math.random() * 9 + 6, opacity: 0.85, angle: Math.PI / 5.5 });
+    }
+    setTimeout(spawnMeteor, 1200);
+    setInterval(() => { if (meteors.filter(m => m.opacity > 0).length < 2) spawnMeteor(); }, 3200);
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stars.forEach(s => {
+        s.twinkle += s.twinkleSpeed;
+        const op = s.opacity * (0.55 + 0.45 * Math.sin(s.twinkle));
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${op.toFixed(3)})`; ctx.fill();
+        s.y -= s.speed; if (s.y < -2) { s.y = canvas.height + 2; s.x = Math.random() * canvas.width; }
+      });
+      for (let i = meteors.length - 1; i >= 0; i--) {
+        const m = meteors[i]; if (m.opacity <= 0) { meteors.splice(i, 1); continue; }
+        const dx = Math.cos(m.angle) * m.length, dy = Math.sin(m.angle) * m.length;
+        const g = ctx.createLinearGradient(m.x, m.y, m.x - dx, m.y - dy);
+        g.addColorStop(0, `rgba(255,255,255,${m.opacity.toFixed(3)})`);
+        g.addColorStop(0.35, `rgba(180,255,160,${(m.opacity * 0.5).toFixed(3)})`);
+        g.addColorStop(1, 'rgba(57,255,20,0)');
+        ctx.beginPath(); ctx.moveTo(m.x, m.y); ctx.lineTo(m.x - dx, m.y - dy);
+        ctx.strokeStyle = g; ctx.lineWidth = 1.5; ctx.stroke();
+        m.x += Math.cos(m.angle) * m.speed; m.y += Math.sin(m.angle) * m.speed; m.opacity -= 0.012;
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+
+  // ── Chart defaults ─────────────────────────────────────────────────────────
+  Chart.defaults.color = '#94A3B8';
+  Chart.defaults.font.family = "'Inter', -apple-system, sans-serif";
+
+  // ── Bar Chart — Channel Contributions ──────────────────────────────────────
+  const barCtx = document.getElementById('barChart').getContext('2d');
+  new Chart(barCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Google Search', 'TripAdvisor', 'Email', 'Facebook'],
+      datasets: [{
+        label: '% of Booking Revenue',
+        data: [71, 19, 6, 4],
+        backgroundColor: ['rgba(57,255,20,0.85)', 'rgba(0,184,255,0.7)', 'rgba(159,122,234,0.7)', 'rgba(71,85,105,0.6)'],
+        borderColor:     ['rgba(57,255,20,1)',    'rgba(0,184,255,1)',   'rgba(159,122,234,1)',   'rgba(71,85,105,0.8)'],
+        borderWidth: 1,
+        borderRadius: 6,
+        borderSkipped: false,
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0C1829',
+          borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
+          callbacks: { label: ctx => `  ${ctx.raw}% of booking revenue` }
+        }
+      },
+      scales: {
+        x: {
+          min: 0, max: 100,
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          ticks: { callback: v => v + '%', font: { size: 12 } },
+          border: { color: 'rgba(255,255,255,0.08)' }
+        },
+        y: {
+          grid: { display: false },
+          ticks: { font: { size: 13, weight: '600' }, color: '#F1F5F9' },
+          border: { color: 'rgba(255,255,255,0.08)' }
+        }
+      },
+      animation: {
+        duration: 1200, easing: 'easeOutQuart',
+        delay: ctx => ctx.dataIndex * 120
+      }
+    }
+  });
+
+  // ── Line Chart — Actual vs Predicted ──────────────────────────────────────
+  const lineCtx = document.getElementById('lineChart').getContext('2d');
+  new Chart(lineCtx, {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      datasets: [
+        {
+          label: 'Actual Bookings',
+          data: [12, 15, 19, 26, 41, 78, 104, 110, 82, 54, 20, 17],
+          borderColor: '#39FF14',
+          backgroundColor: 'rgba(57,255,20,0.06)',
+          borderWidth: 2.5,
+          pointBackgroundColor: '#39FF14',
+          pointBorderColor: '#070D19',
+          pointBorderWidth: 2,
+          pointRadius: 5,
+          fill: true,
+          tension: 0.4
+        },
+        {
+          label: 'Model Prediction',
+          data: [11, 14, 21, 27, 39, 81, 101, 113, 84, 51, 22, 16],
+          borderColor: '#6366F1',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          borderDash: [6, 3],
+          pointBackgroundColor: '#6366F1',
+          pointBorderColor: '#070D19',
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          fill: false,
+          tension: 0.4
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#0C1829',
+          borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1,
+          mode: 'index', intersect: false,
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { font: { size: 12 } },
+          border: { color: 'rgba(255,255,255,0.08)' }
+        },
+        y: {
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          ticks: { font: { size: 12 }, callback: v => v + ' bkgs' },
+          border: { color: 'rgba(255,255,255,0.08)' }
+        }
+      },
+      animation: { duration: 1400, easing: 'easeOutQuart' }
+    }
+  });
+</script>
+</body>
+</html>
