@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Headwaters™ — The Attribution Instrument by New England Growth Studio</title>
+  <meta name="description" content="Headwaters is a marketing-mix attribution instrument for operators with seasonal revenue. Upload your data, get a plain-language answer in about 60 seconds: which channels actually drove revenue.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://getheadwaters.app/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://getheadwaters.app/">
+  <meta property="og:title" content="Headwaters™ — Know which channels actually drive your revenue">
+  <meta property="og:description" content="Upload your data. Get a plain-language attribution answer in about 60 seconds. Built by New England Growth Studio.">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --abyss:#0A1628;--bio:#00B88A;--salt:#C8D8D0;--tide:#4A6E7E;--beacon:#C47A35;
+      --abyss-raised:#0E1D33;--hairline:rgba(74,110,126,.35);
+      --display:'Archivo',sans-serif;--body:'IBM Plex Sans',sans-serif;--mono:'IBM Plex Mono',monospace;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{background:var(--abyss);color:var(--salt);font-family:var(--body);font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased;}
+    .contours{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.05;}
+    header,main,footer{position:relative;z-index:1;}
+    .container{max-width:1060px;margin:0 auto;padding:0 32px;}
+    h1,h2,h3{font-family:var(--display);color:var(--salt);letter-spacing:-.02em;}
+    h1{font-weight:800;font-size:clamp(36px,5.5vw,56px);line-height:1.0;}
+    h2{font-weight:700;font-size:clamp(26px,3.6vw,36px);line-height:1.05;}
+    h3{font-weight:600;font-size:19px;letter-spacing:-.01em;}
+    .label{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--bio);}
+    .coords{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--tide);}
+    a{color:inherit;text-decoration:none;}
+    .btn{display:inline-block;font-family:var(--mono);font-size:13px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;padding:16px 28px;line-height:1;}
+    .btn-primary{background:var(--bio);color:var(--abyss);}
+    .btn-primary:hover{background:var(--salt);}
+    .btn-ghost{border:1px solid var(--tide);color:var(--salt);}
+    .btn-ghost:hover{border-color:var(--salt);}
+
+    header{position:sticky;top:0;background:var(--abyss);border-bottom:1px solid var(--hairline);z-index:50;}
+    .nav{display:flex;align-items:center;justify-content:space-between;height:72px;}
+    .nav-right{display:flex;align-items:center;gap:28px;}
+    .nav-right a{font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--salt);}
+    .nav-right a:hover{color:var(--bio);}
+    .nav-right .nav-cta{background:var(--bio);color:var(--abyss);padding:11px 18px;}
+    .nav-right .nav-cta:hover{background:var(--salt);color:var(--abyss);}
+
+    /* Headwaters product lockup */
+    .hw-lockup{display:flex;align-items:center;gap:13px;}
+    .hw-lockup .word{font-family:var(--display);font-weight:800;font-size:17px;letter-spacing:.05em;text-transform:uppercase;color:var(--salt);line-height:1;}
+    .hw-lockup .by{display:block;font-family:var(--mono);font-weight:400;font-size:8.5px;letter-spacing:.22em;color:var(--tide);margin-top:5px;text-transform:uppercase;}
+
+    section{padding:92px 0;border-bottom:1px solid var(--hairline);}
+    .hero{padding:104px 0 88px;}
+    .hero-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:48px;}
+    .hero h1{max-width:18ch;}
+    .hero-sub{margin:28px 0 40px;font-size:18px;font-weight:300;max-width:54ch;line-height:1.6;}
+    .hero-cta{display:flex;gap:16px;flex-wrap:wrap;align-items:center;}
+    .hero-fine{font-family:var(--mono);font-size:12px;color:var(--tide);margin-top:20px;letter-spacing:.04em;}
+
+    /* chart panel */
+    .panel{background:var(--abyss-raised);border:1px solid var(--hairline);padding:40px;margin-top:64px;}
+    .panel-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:28px;}
+    .panel-title{font-family:var(--display);font-weight:600;font-size:18px;}
+    .chart{display:grid;gap:14px;}
+    .row{display:grid;grid-template-columns:130px 1fr 64px;align-items:center;gap:16px;}
+    .row .ch{font-size:13px;color:var(--salt);}
+    .row .track{height:22px;position:relative;}
+    .row .bar{height:100%;background:var(--bio);border-radius:0 4px 4px 0;min-width:3px;transition:opacity .15s;}
+    .row:hover .bar{opacity:.8;}
+    .row .val{font-family:var(--mono);font-size:13px;color:var(--salt);text-align:right;}
+    .chart-axis{grid-column:1/-1;border-top:1px solid var(--hairline);padding-top:10px;display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--tide);letter-spacing:.08em;}
+    .panel-cap{font-family:var(--mono);font-size:11px;color:var(--tide);letter-spacing:.06em;margin-top:24px;}
+
+    .sec-head{display:grid;grid-template-columns:170px 1fr;gap:44px;margin-bottom:52px;}
+    .sec-body p{margin-bottom:18px;max-width:62ch;}
+    .sec-body p:last-child{margin-bottom:0;}
+
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+    .step{border-top:1px solid var(--hairline);padding-top:22px;}
+    .step .num{font-family:var(--mono);font-size:12px;color:var(--bio);letter-spacing:.18em;}
+    .step h3{margin:12px 0 8px;}
+    .step p{font-size:13.5px;color:var(--tide);line-height:1.65;}
+
+    .quote-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:56px;align-items:center;}
+    .quote{font-family:var(--display);font-weight:600;font-size:clamp(20px,2.6vw,26px);line-height:1.3;letter-spacing:-.015em;}
+    .quote-attr{font-family:var(--mono);font-size:12px;color:var(--tide);letter-spacing:.1em;margin-top:20px;text-transform:uppercase;}
+    .quote-data{border:1px solid var(--hairline);background:var(--abyss-raised);padding:30px;display:grid;gap:12px;}
+    .qd-row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:13px;border-bottom:1px solid var(--hairline);padding-bottom:12px;}
+    .qd-row:last-child{border-bottom:none;padding-bottom:0;}
+    .qd-row .k{color:var(--tide);}
+    .qd-row .v{color:var(--salt);}
+    .qd-row .v--live{color:var(--bio);}
+
+    .fit-list{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--hairline);}
+    .fit{font-size:14px;color:var(--salt);padding:16px 20px 16px 0;border-bottom:1px solid var(--hairline);}
+    .fit span{font-family:var(--mono);font-size:11px;color:var(--bio);margin-right:12px;}
+
+    .price-wrap{max-width:560px;}
+    .price-card{border:1px solid var(--hairline);background:var(--abyss-raised);padding:40px;margin-top:40px;position:relative;}
+    .founding{position:absolute;top:0;right:0;background:var(--beacon);color:var(--abyss);font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;padding:8px 14px;}
+    .price{font-family:var(--display);font-weight:800;font-size:52px;letter-spacing:-.02em;line-height:1;}
+    .price small{font-family:var(--mono);font-size:13px;font-weight:400;color:var(--tide);letter-spacing:.06em;}
+    .price-was{font-family:var(--mono);font-size:13px;color:var(--tide);margin-top:8px;}
+    .price-was s{text-decoration:line-through;}
+    .price-inc{margin:26px 0 32px;display:grid;gap:10px;}
+    .price-inc div{font-size:14px;color:var(--salt);}
+    .price-inc span{font-family:var(--mono);font-size:11px;color:var(--bio);margin-right:12px;}
+
+    footer{padding:64px 0 44px;border-bottom:none;}
+    .foot{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;}
+    .foot a{border-bottom:1px solid var(--tide);}
+    .foot a:hover{color:var(--bio);border-color:var(--bio);}
+
+    @media(max-width:860px){
+      .sec-head,.quote-grid{grid-template-columns:1fr;gap:28px;}
+      .steps,.fit-list{grid-template-columns:1fr;}
+      .row{grid-template-columns:96px 1fr 52px;}
+      .nav-right a:not(.nav-cta){display:none;}
+    }
+  </style>
+</head>
+<body>
+
+<svg class="contours" width="100%" height="100%" preserveAspectRatio="none" aria-hidden="true">
+  <defs>
+    <pattern id="ct" width="900" height="260" patternUnits="userSpaceOnUse">
+      <path d="M0 40 Q225 10 450 40 T900 40" fill="none" stroke="#4A6E7E" stroke-width="1"/>
+      <path d="M0 120 Q225 90 450 120 T900 120" fill="none" stroke="#4A6E7E" stroke-width="1"/>
+      <path d="M0 200 Q225 170 450 200 T900 200" fill="none" stroke="#4A6E7E" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#ct)"/>
+</svg>
+
+<header>
+  <div class="container nav">
+    <a href="#" class="hw-lockup" aria-label="Headwaters — home">
+      <!-- Headwaters glyph — contour streams converging to the source point -->
+      <svg width="34" height="30" viewBox="0 0 68 60" aria-hidden="true">
+        <path d="M4 14 Q26 8 46 14 T64 12" fill="none" stroke="#C8D8D0" stroke-width="3"/>
+        <path d="M8 30 Q28 24 46 30 T64 28" fill="none" stroke="#C8D8D0" stroke-width="3"/>
+        <path d="M14 46 Q32 40 48 46 T64 44" fill="none" stroke="#4A6E7E" stroke-width="3"/>
+        <circle cx="8" cy="30" r="5" fill="#00B88A"/>
+      </svg>
+      <span class="word">Headwaters™<span class="by">By New England Growth Studio</span></span>
+    </a>
+    <nav class="nav-right">
+      <a href="#how">How It Works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="https://newenglandgrowthstudio.com" target="_blank" rel="noopener">The Studio</a>
+      <a href="checkout.html" class="nav-cta">Run a Chart →</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-top">
+      <span class="label">The Attribution Instrument</span>
+      <span class="coords">43.2081° N&ensp;71.5376° W</span>
+    </div>
+    <h1>Find out which channels are actually driving your revenue.</h1>
+    <p class="hero-sub">Most operators can tell you what they spent last season. Headwaters tells you what it <em>did</em>. Upload your data, and in about sixty seconds you get a plain-language answer — channel by channel, season by season, honest error bars included.</p>
+    <div class="hero-cta">
+      <a href="#pricing" class="btn btn-primary">Run Your First Chart →</a>
+      <a href="#how" class="btn btn-ghost">How It Works</a>
+    </div>
+    <p class="hero-fine">No dashboard to learn. No analyst to hire. One question, answered.</p>
+
+    <!-- Example chart -->
+    <div class="panel">
+      <div class="panel-head">
+        <span class="panel-title">Booking revenue by channel — contribution</span>
+        <span class="label" style="color:var(--tide);">Example Output</span>
+      </div>
+      <div class="chart" role="img" aria-label="Bar chart: Google Search 71%, TripAdvisor 19%, Email 6%, Facebook 4% of booking revenue">
+        <div class="row" title="Google Search — 71% of booking revenue"><span class="ch">Google Search</span><div class="track"><div class="bar" style="width:71%;"></div></div><span class="val">71%</span></div>
+        <div class="row" title="TripAdvisor — 19% of booking revenue"><span class="ch">TripAdvisor</span><div class="track"><div class="bar" style="width:19%;"></div></div><span class="val">19%</span></div>
+        <div class="row" title="Email — 6% of booking revenue"><span class="ch">Email</span><div class="track"><div class="bar" style="width:6%;"></div></div><span class="val">6%</span></div>
+        <div class="row" title="Facebook — 4% of booking revenue"><span class="ch">Facebook</span><div class="track"><div class="bar" style="width:4%;"></div></div><span class="val">4%</span></div>
+        <div class="chart-axis"><span>0%</span><span>share of modeled booking revenue</span><span>100%</span></div>
+      </div>
+      <p class="panel-cap">Birch Hill Inn · FY25 · modeled from 24 months of bookings and spend · full table and error ranges in the report</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section id="how">
+  <div class="container">
+    <div class="sec-head">
+      <span class="label">How It Works</span>
+      <div>
+        <h2>One upload. One model. One answer.</h2>
+        <div class="sec-body" style="margin-top:22px;">
+          <p>Headwaters runs marketing-mix modeling — the method large companies pay analysts six figures to run — tuned for operators with seasonal revenue. It doesn't need tracking pixels or cookies. It needs your history: what you spent, and what you booked.</p>
+        </div>
+      </div>
+    </div>
+    <div class="steps">
+      <div class="step"><span class="num">01</span><h3>Upload</h3><p>Export bookings and marketing spend from wherever they live — spreadsheets are fine. Drop the CSV in. No integrations, no IT project.</p></div>
+      <div class="step"><span class="num">02</span><h3>Model</h3><p>Headwaters maps spend to revenue channel by channel, accounting for seasonality and the multi-touch way customers actually find you.</p></div>
+      <div class="step"><span class="num">03</span><h3>Answer</h3><p>In about sixty seconds: which channels drove revenue, which didn't, and what we still can't say for sure — in plain language, with error bars.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF -->
+<section>
+  <div class="container">
+    <div class="quote-grid">
+      <div>
+        <span class="label">Field Note — 01</span>
+        <p class="quote" style="margin-top:20px;">"Google Search was driving 71% of booking revenue. Facebook was contributing less than 4%. We moved the budget the same week."</p>
+        <p class="quote-attr">Birch Hill Inn · New England</p>
+      </div>
+      <div class="quote-data">
+        <div class="qd-row"><span class="k">months modeled</span><span class="v">24</span></div>
+        <div class="qd-row"><span class="k">top channel</span><span class="v v--live">google · 71%</span></div>
+        <div class="qd-row"><span class="k">weakest paid channel</span><span class="v">facebook · &lt;4%</span></div>
+        <div class="qd-row"><span class="k">action taken</span><span class="v">budget reallocated</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO -->
+<section>
+  <div class="container">
+    <div class="sec-head">
+      <span class="label">Built For</span>
+      <div><h2>Operators with seasonal revenue and a real budget on the line.</h2></div>
+    </div>
+    <div class="fit-list">
+      <div class="fit"><span>01</span>Inns, lodges &amp; B&amp;Bs</div>
+      <div class="fit"><span>02</span>Campgrounds &amp; RV parks</div>
+      <div class="fit"><span>03</span>Guides &amp; outfitters</div>
+      <div class="fit"><span>04</span>Retail &amp; e-commerce</div>
+      <div class="fit"><span>05</span>Trades &amp; home services</div>
+      <div class="fit"><span>06</span>Any operator who advertises</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="container">
+    <div class="price-wrap">
+      <span class="label">Pricing</span>
+      <h2 style="margin-top:18px;">Less than one wasted ad month.</h2>
+      <div class="price-card">
+        <span class="founding">Founding Price</span>
+        <div class="price">$297 <small>/ year</small></div>
+        <div class="price-was"><s>$497 regular</s> — founding price locked for life</div>
+        <div class="price-inc">
+          <div><span>■</span>Unlimited attribution runs for one business</div>
+          <div><span>■</span>Plain-language reports with honest error ranges</div>
+          <div><span>■</span>Season-over-season comparison as your data grows</div>
+          <div><span>■</span>Included free in every NEGS consulting engagement</div>
+        </div>
+        <a href="checkout.html" class="btn btn-primary">Get Founding Access →</a>
+        <p style="font-family:var(--mono);font-size:11px;color:var(--tide);margin-top:14px;letter-spacing:.06em;">Want to see it first? <a href="demo.html" style="color:var(--salt);border-bottom:1px solid var(--tide);">View the live demo</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="container foot">
+    <div class="hw-lockup">
+      <svg width="28" height="25" viewBox="0 0 68 60" aria-hidden="true">
+        <path d="M4 14 Q26 8 46 14 T64 12" fill="none" stroke="#C8D8D0" stroke-width="3"/>
+        <path d="M8 30 Q28 24 46 30 T64 28" fill="none" stroke="#C8D8D0" stroke-width="3"/>
+        <path d="M14 46 Q32 40 48 46 T64 44" fill="none" stroke="#4A6E7E" stroke-width="3"/>
+        <circle cx="8" cy="30" r="5" fill="#00B88A"/>
+      </svg>
+      <span class="word" style="font-size:14px;">Headwaters™</span>
+    </div>
+    <span class="coords">An instrument by <a href="https://newenglandgrowthstudio.com" target="_blank" rel="noopener">New England Growth Studio</a> · Lakes Region, NH</span>
+  </div>
+</footer>
+
+</body>
+</html>
